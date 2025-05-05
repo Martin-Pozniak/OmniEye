@@ -1,0 +1,18 @@
+# Ignore all node_modules recursively
+**/node_modules/
+
+# Ignore build outputs
+**/dist/
+**/.next/
+**/out/
+
+# Ignore logs and environment files
+**/*.log
+**/.env
+**/.env.local
+
+# OS and editor-specific
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

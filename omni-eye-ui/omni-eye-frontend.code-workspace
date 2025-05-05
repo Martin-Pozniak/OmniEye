@@ -1,0 +1,24 @@
+{
+    "folders": [
+      {
+        "path": "."
+      }
+    ],
+    "settings": {
+      "typescript.tsdk": "node_modules/typescript/lib",
+      "eslint.workingDirectories": [{ "mode": "auto" }]
+    },
+    "tasks": {
+      "version": "2.0.0",
+      "tasks": [
+        {
+          "label": "Start Dev Server",
+          "type": "shell",
+          "command": "npm run dev",
+          "problemMatcher": [],
+          "group": "build"
+        }
+      ]
+    }
+  }
+  
