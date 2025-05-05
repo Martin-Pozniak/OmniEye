@@ -6,6 +6,7 @@ import NavigationMenu from "../components/NavigationMenu";
 import PersonSearchForm from "@/components/PersonSearchForm";
 import PersonSearchResultsList from "@/components/PersonSearchResultsList";
 import { AnimatePresence, motion } from 'framer-motion';
+import SystemFingerprint from '@/components/SystemFingerprint';
 
 export default function Home() {
 
@@ -114,6 +115,8 @@ export default function Home() {
           <p className="text-sm text-gray-500 mt-2">
             Search for people across the web and find out what information is publicly available about them.
           </p>
+
+          <SystemFingerprint />
 
           <Image
             src="/logo.png"
