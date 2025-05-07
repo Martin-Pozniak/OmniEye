@@ -37,8 +37,6 @@ export default function PersonSearchForm({ onFormSubmit }: PersonSearchFormProps
     return (
         <form className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-md w-full" onSubmit={handleSubmit}>
 
-            <h2 className="text-xl font-bold text-gray-900">Search for someone</h2>
-
             <div className="flex flex-col gap-2">
 
                 <div className="flex flex-row gap-4 overflow-auto">

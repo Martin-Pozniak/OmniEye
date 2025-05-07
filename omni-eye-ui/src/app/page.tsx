@@ -94,10 +94,21 @@ export default function Home() {
         <NavigationMenu />
       </header>
 
-      <main className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-10 items-center p-10 ">
+      <main className="flex flex-row overflow-y-auto gap-10 p-10 bg-gray-900">
 
         <div className="flex flex-col items-center sm:items-start">
-          <h1 className="text-4xl font-bold">Omni Eye</h1>
+
+          <div className="flex flex-row items-center gap-2">
+            <Image
+              src="/logo.png"
+              alt="Omni Eye Logo"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <h1 className="text-4xl font-bold p-0 m-0">Omni Eye</h1>
+
+          </div>
 
           <AnimatePresence mode="wait">
               <motion.h3
@@ -112,24 +123,15 @@ export default function Home() {
               </motion.h3>
           </AnimatePresence>
 
-          <p className="text-sm text-gray-500 mt-2">
-            Search for people across the web and find out what information is publicly available about them.
-          </p>
-
           <SystemFingerprint />
 
-          <Image
-            src="/logo.png"
-            alt="Omni Eye Logo"
-            width={200}
-            height={200}
-            className="rounded-full mt-5"
-          />
-          
         </div>
         
-        <div className="flex flex-col flex-basis-80 justify-center sm:justify-end">
+        <div className="flex flex-col flex-basis-70">
 
+          <h2 className="text-2xl font-bold mb-4">
+            Search for people across the web and find out what information is publicly available about them.
+          </h2>
            {(!isLoading && searchResults.length < 1 && <PersonSearchForm onFormSubmit={handleFormSubmit} />)}
 
           { (isLoading || searchResults.length > 0 ) && 
@@ -142,20 +144,18 @@ export default function Home() {
             </div>
           }
 
-        </div>
-        
-        <div className="flex flex-col">
-          <p className="text-sm text-gray-500 mt-2">
-            This tool is intended for use by security researchers, privacy advocates, and individuals seeking to identify and manage their publicly available personal information. Its purpose is to empower users to take back control of their digital footprint and enhance personal privacy. 
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            <strong>
-              Any use of this tool for malicious purposes, unauthorized surveillance, harassment, or other unethical activities is strictly prohibited and against our policy. Misuse may violate applicable laws and regulations.
-            </strong>
-          </p>
-        </div>
+          <div className="flex flex-col">
+            <p className="text-sm text-gray-500 mt-2">
+              This tool is intended for use by security researchers, privacy advocates, and individuals seeking to identify and manage their publicly available personal information. Its purpose is to empower users to take back control of their digital footprint and enhance personal privacy. 
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              <strong>
+                Any use of this tool for malicious purposes, unauthorized surveillance, harassment, or other unethical activities is strictly prohibited and against our policy. Misuse may violate applicable laws and regulations.
+              </strong>
+            </p>
+          </div>
 
-
+        </div>
 
       </main>
 

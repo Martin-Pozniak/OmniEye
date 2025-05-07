@@ -13,22 +13,30 @@ app.use(express.json());
 
 // Function to analyze the fingerprint using the Ollama API
 export async function AnalyzeFingerprint(c_fingerprintJson: object): Promise<string> {
-  const prompt = `
-I want you to act as a digital OSINT analyst. Based on the following browser fingerprinting and geolocation data, infer what we can reasonably know or assume about the user.
 
-Only draw conclusions that would be valid based on the data. Be precise, and explain your reasoning.
+    // Extract all properties except canvasFingerPrint
+    const { canvasFingerprint, ...filteredFingerprint } = c_fingerprintJson;
 
-Data:
-${JSON.stringify(c_fingerprintJson, null, 2)}
+    // Convert the filtered fingerprint object to a string
+    const fingerprintData = JSON.stringify(filteredFingerprint, null, 2);
 
-What can we infer or say about this visitor?
-`;
+    const prompt = `You are a digital OSINT analyst. Given the following fingerprint and browser metadata, respond directly to the visitor with what you can infer about them.
+        Use a friendly but informative tone. Start by identifying their specific location as granular as possible, system, then mention any other insights or assumptions based on the device, specs, or usage patterns.
+        Only respond with the message — no setup, context, or explanations. Keep the response short and use phrasing that highlights how much you know about them based on the data provided. The response should only be 4 sentences long.
+        Here is the data: ${fingerprintData}
+        Respond like: “We can tell you’re visiting from [city, state], using a [device/OS/browser]. Based on your system specifications and setup, here’s what we can infer about you: ... Here are ways this data exposes you”
 
-  const response = await axios.post(process.env.OLLAMA_URL, {
-    model: 'llama3',
-    prompt: prompt,
-    stream: false, // We want the full response at once
-  });
+    `;
+
+  const response = await axios.post(
+        process.env.OLLAMA_URL, 
+        {
+            model: 'llama3',
+            prompt: prompt,
+            stream: false, // We want the full response at once
+            temperature: 0.1, // Adjust the temperature for more or less randomness
+        }
+    );
 
   return response.data.response;
 }
@@ -82,7 +90,7 @@ app.post('/api/user/summary', async (req, res) => {
     return res.json({ analysis: m_sAnalysis });
   } catch (err) {
     console.error('Failed to analyze fingerprint:', err);
-    return res.status(500).json({ error: 'Analysis failed' });
+    return res.status(500).json({ error: 'Analysis failed', errorMessage: err });
   }
 });
 

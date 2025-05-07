@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import { PuffLoader } from 'react-spinners';
 
 interface VisitorData {
   visitorId: string;
@@ -137,12 +138,15 @@ export default function SystemFingerprint() {
 
           if (response.ok) {
             const data = await response.json();
-            set_cUserSummary(data);
+            set_cUserSummary(data.analysis.toString());
           } else {
             console.error('Failed to fetch user summary:', response.statusText);
           }
         } catch (error) {
           console.error('Error fetching user summary:', error);
+
+          set_cUserSummary('An error occurred while fetching the user summary. Please try again later.');
+
         } finally {
           set_bLoading(false);
         }
@@ -157,27 +161,23 @@ export default function SystemFingerprint() {
   if (!m_cVisitorData) return <div>Loading full visitor info...</div>;
 
   return (
-    <div style={{ fontFamily: 'monospace', padding: '1rem' }}>
-      <h2>🧠 Your Visitor Fingerprint</h2>
-      <p style={{ fontSize: '0.9rem', color: '#888' }}>
-        Below is a detailed fingerprint of your system. This information is what websites can see about you by default. 
-        It is not personally identifiable information (PII) but it can be used to track you. Mixed with other data, it can be used to identify you.
-        <br />
-      </p>
+    <div>
+      <p className='mt-5'>Just by visiting this website here is what we can tell about you:</p>
 
       {m_cVisitorData && (
         <div>
-          <h3>Here is what we can tell about you:</h3>
 
           {m_bUserSummaryLoading ? (
-            <div>Loading user summary...</div>
+                                <PuffLoader color="#3B82F6" loading={m_bUserSummaryLoading} size={50} />
+
           ) : (
             m_cUserSummary && (
               <div>
-                <h4>User Summary:</h4>
-                <pre style={{ background: '#f4f4f4', padding: '1rem', borderRadius: '4px', color: '#333' }}>
-                  {m_cUserSummary}
-                </pre>
+                  <p className="whitespace-pre-wrap text-sm ">
+                    <strong>
+                      {m_cUserSummary}
+                    </strong>
+                  </p>
               </div>
             )
           )}
@@ -185,7 +185,14 @@ export default function SystemFingerprint() {
         </div>
       )}
 
-      <ul className="max-h-[400px] overflow-y-auto border border-gray-300 bg-gray-100 p-4 rounded text-black">
+      <h3 className='mt-5'>Technical fingerprint</h3>
+      <p style={{ fontSize: '0.9rem', color: '#888' }}>
+        Below is a detailed technical fingerprint of your system. This information is what websites can see about you by default. 
+        It is not personally identifiable information (PII) but it can be used to track you. Mixed with other data, it could be used to identify you.
+        <br />
+      </p>
+
+      <ul className=" overflow-y-auto border border-gray-300 bg-gray-100 p-4 rounded text-black">
         <li><strong>IP:</strong> {m_cVisitorData.ip}</li>
         <li><strong>Location:</strong> {m_cVisitorData.city}, {m_cVisitorData.region}, {m_cVisitorData.country}</li>
         <li><strong>ISP:</strong> {m_cVisitorData.org}</li>
