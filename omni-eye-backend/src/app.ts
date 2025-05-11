@@ -1,9 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import OpenAI from 'openai';
 
 import { runPeopleSearch } from './api/searchController.js';
 import axios from 'axios';
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 dotenv.config();
 
@@ -14,31 +19,68 @@ app.use(express.json());
 // Function to analyze the fingerprint using the Ollama API
 export async function AnalyzeFingerprint(c_fingerprintJson: object): Promise<string> {
 
+    if (process.env.OLLAMA_URL === undefined) {
+      throw new Error('OLLAMA_URL is not defined in the environment variables.');
+    }
+
+    if (process.env.OPENAI_API_KEY === undefined) {
+      throw new Error('OPENAI_API_KEY is not defined in the environment variables.');
+    }
+
+    const m_bUseOllama = false;
+
     // Extract all properties except canvasFingerPrint
     const { canvasFingerprint, ...filteredFingerprint } = c_fingerprintJson;
 
     // Convert the filtered fingerprint object to a string
     const fingerprintData = JSON.stringify(filteredFingerprint, null, 2);
 
-    const prompt = `You are a digital OSINT analyst. Given the following fingerprint and browser metadata, respond directly to the visitor with what you can infer about them.
-        Use a friendly but informative tone. Start by identifying their specific location as granular as possible, system, then mention any other insights or assumptions based on the device, specs, or usage patterns.
-        Only respond with the message — no setup, context, or explanations. Keep the response short and use phrasing that highlights how much you know about them based on the data provided. The response should only be 4 sentences long.
-        Here is the data: ${fingerprintData}
-        Respond like: “We can tell you’re visiting from [city, state], using a [device/OS/browser]. Based on your system specifications and setup, here’s what we can infer about you: ... Here are ways this data exposes you”
+    const prompt = `You are a skilled digital OSINT analyst. Using the detailed fingerprint and browser metadata provided below, directly respond to the visitor by revealing insightful and personalized inferences about their current situation, likely environment, device usage patterns, and potential privacy implications.
 
-    `;
+Explicitly mention their precise geographic location (city, state), the type of device they're using (including OS and browser), and infer if they're currently mobile or stationary based on battery status, connection type, touch support, screen resolution, hardware specs (CPU cores, GPU, RAM), installed plugins, ISP details, and browsing mode. Highlight specifically what their device configuration and browsing data might imply about their professional or personal context, and briefly indicate privacy risks or insights that this data reveals about them.
 
-  const response = await axios.post(
-        process.env.OLLAMA_URL, 
-        {
-            model: 'llama3',
-            prompt: prompt,
-            stream: false, // We want the full response at once
-            temperature: 0.1, // Adjust the temperature for more or less randomness
-        }
-    );
+Keep your response concise, friendly, and engaging, strictly limited to 5 sentences. Do not include any introductory explanations.
 
-  return response.data.response;
+Provided data:
+${fingerprintData}
+
+Respond exactly like:
+"We see you're currently in [City, State], using a [Device type/OS/Browser]. Your [battery level, connection type, and touch support status] suggest you’re likely [mobile/stationary]. Given your hardware specs like [CPU/GPU/RAM], you’re probably engaged in [type of professional, technical, or personal activity]. Using [plugins installed or ISP type] indicates [insight about their context]. Together, these details expose [specific privacy implications or insights about their behavior]."`;
+
+    try {
+      let response;
+  
+      if (m_bUseOllama) {
+          // Using Ollama for local model inference
+          response = await axios.post(
+              process.env.OLLAMA_URL, 
+              {
+                  model: 'llama3',
+                  prompt: prompt,
+                  stream: false,
+                  temperature: 0.1,
+              }
+          );
+      } else {
+          // Using OpenAI as a fallback
+          response = await client.responses.create({
+              model: 'gpt-4-turbo',
+              input: prompt,
+          });
+      }
+  
+      // Handle the response based on the provider
+      const cResponseText = m_bUseOllama
+          ? response.data.response // Ollama response format
+          : response.output_text; // OpenAI response format
+  
+      return cResponseText;
+  
+  } catch (error) {
+      console.error("Error during LLM request:", error);
+      throw new Error("Unable to fetch response from language model provider.");
+  }
+
 }
 
 
