@@ -14,5 +14,4 @@
 # OS and editor-specific
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/

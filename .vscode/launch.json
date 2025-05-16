@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/omni-eye-backend/src/app.ts",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceFolder}/omni-eye-backend",
+      "envFile": "${workspaceFolder}/omni-eye-backend/.env"
+    },
+    {
+      "type": "node-terminal",
+      "request": "launch",
+      "name": "Debug Frontend",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/omni-eye-frontend",
+      "envFile": "${workspaceFolder}/omni-eye-frontend/.env"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Backend & Frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:full"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
