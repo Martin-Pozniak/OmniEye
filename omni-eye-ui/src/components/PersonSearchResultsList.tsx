@@ -2,9 +2,33 @@ import { useState, useEffect } from 'react';
 import { PuffLoader } from 'react-spinners';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function PersonSearchResultsList({ results, isLoading }) { 
+type Profile = {
+    username: string;
+    platformName: string;
+    platformURL: string;
+};
 
-    const messages = [
+type Person = {
+    id: string | number;
+    firstName: string;
+    lastName: string;
+    bio?: string;
+    location?: string;
+    age?: number | string;
+    occupation?: string;
+    privacyRank?: string | number;
+    imageLinks?: string[];
+    profiles: Profile[];
+};
+
+type PersonSearchResultsListProps = {
+    results: Person[];
+    isLoading: boolean;
+};
+
+export default function PersonSearchResultsList({ results, isLoading }: PersonSearchResultsListProps) { 
+
+    const messages: string[] = [
         // Original OSINT-flavored lines
         "Querying public records and hidden databases…",
         "Harvesting digital breadcrumbs across the web…",
